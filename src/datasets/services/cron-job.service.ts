@@ -68,25 +68,25 @@ export class CronJobService {
 
       this.logger.log(`Found ${unprocessedUserData.length} unprocessed blobs for dataset ${datasetId}`);
 
-      // Get existing blob IDs from current dataset blob
-      let existingBlobIds: string[] = [];
+      // Get existing quilt IDs from current dataset blob
+      let existingQuiltIds: string[] = [];
       if (dataset.datasetBlobId) {
         try {
-          const existingData = await this.walrusService.retrieveData(dataset.datasetBlobId);
-          existingBlobIds = existingData.blobIds || [];
+          const existingData = await this.walrusService.retrieveConsolidatedData(dataset.datasetBlobId);
+          existingQuiltIds = existingData.quiltIds || [];
         } catch (error) {
-          this.logger.warn(`Could not retrieve existing blob data for dataset ${datasetId}:`, error.message);
+          this.logger.warn(`Could not retrieve existing consolidated data for dataset ${datasetId}:`, error.message);
         }
       }
 
-      // Get new blob IDs from unprocessed user data
-      const newBlobIds = unprocessedUserData.map(ud => ud.blobId);
+      // Get new quilt IDs from unprocessed user data
+      const newQuiltIds = unprocessedUserData.map(ud => ud.blobId);
 
-      // Combine existing and new blob IDs
-      const allBlobIds = [...existingBlobIds, ...newBlobIds];
+      // Combine existing and new quilt IDs
+      const allQuiltIds = [...existingQuiltIds, ...newQuiltIds];
 
       // Create consolidated blob
-      const consolidatedBlobId = await this.walrusService.createConsolidatedBlob(allBlobIds);
+      const consolidatedBlobId = await this.walrusService.createConsolidatedBlob(allQuiltIds);
 
       // Calculate total data size
       let totalDataSize = 0;
@@ -113,7 +113,7 @@ export class CronJobService {
         { _id: { $in: unprocessedUserData.map(ud => ud._id) } }
       ).exec();
 
-      this.logger.log(`Successfully consolidated ${unprocessedUserData.length} blobs for dataset ${datasetId}. New blob ID: ${consolidatedBlobId}`);
+      this.logger.log(`Successfully consolidated ${unprocessedUserData.length} quilts for dataset ${datasetId}. New consolidated blob ID: ${consolidatedBlobId}`);
 
     } catch (error) {
       this.logger.error(`Error consolidating blobs for dataset ${datasetId}:`, error);

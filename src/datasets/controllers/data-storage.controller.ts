@@ -20,13 +20,18 @@ export class DataStorageController {
     return this.dataStorageService.storeUserData(storeDataDto);
   }
 
-  @Get('retrieve/:blobId')
-  async retrieveData(@Param('blobId') blobId: string) {
-    return this.dataStorageService.retrieveUserData(blobId);
+  @Get('retrieve/:quiltId')
+  async retrieveData(@Param('quiltId') quiltId: string) {
+    return this.dataStorageService.retrieveUserData(quiltId);
   }
 
   @Get('unprocessed/:datasetId')
   async getUnprocessedData(@Param('datasetId') datasetId: string) {
     return this.dataStorageService.getUnprocessedUserData(datasetId);
+  }
+
+  @Get('consolidated/:datasetId')
+  async getConsolidatedData(@Param('datasetId') datasetId: string) {
+    return this.dataStorageService.retrieveConsolidatedDataset(datasetId);
   }
 }
