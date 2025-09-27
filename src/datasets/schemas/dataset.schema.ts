@@ -23,6 +23,9 @@ export class Dataset {
   @Prop({ required: true })
   datasetBlobId: string;
 
+  @Prop({ type: [String], default: [] })
+  consolidatedBlobIds: string[];
+
   @Prop({ required: true })
   dataFormat: string;
 
