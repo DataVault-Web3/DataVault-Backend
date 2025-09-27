@@ -80,4 +80,20 @@ export class DatasetsService {
       categories,
     };
   }
+
+  async downloadDataset(id: string): Promise<any> {
+    const dataset = await this.findOne(id);
+    
+    return true
+    // Return dataset download information
+    // return {
+    //   id: dataset._id,
+    //   name: dataset.name,
+    //   description: dataset.description,
+    //   downloadUrl: dataset.downloadUrl || `https://your-storage.com/datasets/${id}`,
+    //   fileSize: dataset.fileSize || 'Unknown',
+    //   format: dataset.format || 'Unknown',
+    //   downloadInstructions: 'Dataset access granted after payment verification',
+    // };
+  }
 }

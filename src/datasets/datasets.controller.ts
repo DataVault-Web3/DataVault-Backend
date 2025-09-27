@@ -7,23 +7,14 @@ import {
   Param,
   Delete,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { DatasetsService } from './datasets.service';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { UpdateDatasetDto } from './dto/update-dataset.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { PaidAccessGuard } from '../auth/paid-access.guard';
 
 @Controller('datasets')
 export class DatasetsController {
   constructor(private readonly datasetsService: DatasetsService) {}
-
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  create(@Body() createDatasetDto: CreateDatasetDto) {
-    return this.datasetsService.create(createDatasetDto);
-  }
 
   @Get()
   findAll() {
@@ -31,7 +22,6 @@ export class DatasetsController {
   }
 
   @Get('all')
-  @UseGuards(JwtAuthGuard, PaidAccessGuard)
   findAllPrivate() {
     return this.datasetsService.findAll();
   }
@@ -56,15 +46,8 @@ export class DatasetsController {
     return this.datasetsService.findOne(id);
   }
 
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string, @Body() updateDatasetDto: UpdateDatasetDto) {
-    return this.datasetsService.update(id, updateDatasetDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string) {
-    return this.datasetsService.remove(id);
+  @Get(':id/download')
+  downloadDataset(@Param('id') id: string) {
+    return this.datasetsService.downloadDataset(id);
   }
 }

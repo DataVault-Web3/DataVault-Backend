@@ -41,7 +41,7 @@ export class Dataset {
   @Prop({ required: true })
   price: number; // in wei
 
-  @Prop()
+  @Prop({ type: Object })
   metadata?: Record<string, any>;
 }
 
