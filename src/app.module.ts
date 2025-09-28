@@ -9,7 +9,10 @@ import { SeedModule } from './seed/seed.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/datasets-api'),
+    MongooseModule.forRoot(process.env.MONGODB_URI, {
+      retryAttempts: 3,
+      retryDelay: 1000,
+    }),
     DatasetsModule,
     SeedModule,
   ],
