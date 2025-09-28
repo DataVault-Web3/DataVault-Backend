@@ -97,16 +97,11 @@ export class ProofService {
           proofId: savedProof._id.toString()
         }
       };
-
-      // Mock Walrus storage for testing (in production, use real Walrus)
-      const quiltId = `mock_quilt_${savedProof._id}_${Date.now()}`;
-      this.logger.log(`Mock Walrus storage: ${quiltId}`);
       
-      // In production, uncomment this line:
-      // const quiltId = await this.walrusService.storeUserData(
-      //   JSON.stringify(combinedData, null, 2),
-      //   `proof_orders_${savedProof._id}_${Date.now()}`
-      // );
+      const quiltId = await this.walrusService.storeUserData(
+        JSON.stringify(combinedData, null, 2),
+        `proof_orders_${savedProof._id}_${Date.now()}`
+      );
 
       this.logger.log(`Data stored in Walrus with quilt ID: ${quiltId}`);
 

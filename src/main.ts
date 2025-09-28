@@ -12,7 +12,7 @@ async function bootstrap() {
     {
       "GET /datasets/*/download": {
         price: "$0.001", // 1 cent in USD
-        network: "base-sepolia",
+        network: "polygon-amoy",
         config: {
           description: "Download dataset after payment verification",
         }
@@ -30,7 +30,14 @@ async function bootstrap() {
   // }));
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'https://www.amazon.in',
+      'https://amazon.in',
+      'https://www.amazon.com',
+      'https://amazon.com',
+      'chrome-extension://*' // Allow Chrome extensions
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
