@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "store-random-data": "ts-node scripts/store-random-data.ts"
+    "store-random-data": "ts-node scripts/store-random-data.ts",
+    "test-usdc": "ts-node scripts/test-usdc-transfer.ts"
   },
   "dependencies": {
     "@mysten/sui": "^1.38.0",
@@ -32,6 +33,7 @@
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/schedule": "^4.0.0",
+    "@openzeppelin/contracts": "^5.4.0",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",

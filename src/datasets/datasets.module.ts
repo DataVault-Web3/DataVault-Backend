@@ -10,6 +10,7 @@ import { DataStorageService } from './services/data-storage.service';
 import { WalrusService } from './services/walrus.service';
 import { CronJobService } from './services/cron-job.service';
 import { ProofService } from './services/proof.service';
+import { UsdcService } from './services/usdc.service';
 import { Dataset, DatasetSchema } from './schemas/dataset.schema';
 import { UserData, UserDataSchema } from './schemas/user-data.schema';
 import { TempAccess, TempAccessSchema } from './schemas/temp-access.schema';
@@ -28,7 +29,7 @@ import { Order, OrderSchema } from './schemas/order.schema';
     ScheduleModule.forRoot(),
   ],
   controllers: [DatasetsController, DataStorageController, CronJobController, ProofController],
-  providers: [DatasetsService, DataStorageService, WalrusService, CronJobService, ProofService],
-  exports: [DatasetsService, DataStorageService, WalrusService, ProofService],
+  providers: [DatasetsService, DataStorageService, WalrusService, CronJobService, ProofService, UsdcService],
+  exports: [DatasetsService, DataStorageService, WalrusService, ProofService, UsdcService],
 })
 export class DatasetsModule {}

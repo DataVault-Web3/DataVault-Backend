@@ -5,6 +5,7 @@ import { Proof, ProofDocument } from '../schemas/proof.schema';
 import { Order, OrderDocument } from '../schemas/order.schema';
 import { ProofDataDto } from '../dto/proof-data.dto';
 import { WalrusService } from './walrus.service';
+import { UsdcService } from './usdc.service';
 
 @Injectable()
 export class ProofService {
@@ -14,6 +15,7 @@ export class ProofService {
     @InjectModel(Proof.name) private proofModel: Model<ProofDocument>,
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     private walrusService: WalrusService,
+    private usdcService: UsdcService,
   ) {}
 
   /**
@@ -22,7 +24,13 @@ export class ProofService {
   async storeProofData(proofDataDto: ProofDataDto): Promise<{ 
     proofId: string; 
     quiltId: string; 
-    message: string 
+    message: string;
+    usdcTransfer?: {
+      transactionHash: string;
+      recipientAddress: string;
+      amount: string;
+      orderCount: number;
+    } | null;
   }> {
     try {
       this.logger.log('Storing proof data and orders...');
@@ -105,10 +113,27 @@ export class ProofService {
 
       this.logger.log(`Data stored in Walrus with quilt ID: ${quiltId}`);
 
+      // Send USDC to random address after quilt generation
+      let usdcTransferResult = null;
+      try {
+        this.logger.log(`Initiating USDC transfer for ${proofDataDto.orders.length} orders...`);
+        usdcTransferResult = await this.usdcService.sendUsdcForOrders(proofDataDto.orders.length);
+        this.logger.log(`USDC transfer completed: ${usdcTransferResult.transactionHash}`);
+      } catch (usdcError) {
+        this.logger.error('USDC transfer failed:', usdcError);
+        // Don't throw error here - continue with the main flow even if USDC transfer fails
+      }
+
       return {
         proofId: savedProof._id.toString(),
         quiltId,
-        message: 'Proof data and orders stored successfully in MongoDB and Walrus'
+        message: 'Proof data and orders stored successfully in MongoDB and Walrus',
+        usdcTransfer: usdcTransferResult ? {
+          transactionHash: usdcTransferResult.transactionHash,
+          recipientAddress: usdcTransferResult.recipientAddress,
+          amount: usdcTransferResult.amount,
+          orderCount: usdcTransferResult.orderCount
+        } : null
       };
 
     } catch (error) {

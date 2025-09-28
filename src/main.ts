@@ -12,7 +12,7 @@ async function bootstrap() {
     {
       "GET /datasets/*/download": {
         price: "$0.001", // 1 cent in USD
-        network: "polygon-amoy",
+        network: "base-sepolia",
         config: {
           description: "Download dataset after payment verification",
         }
