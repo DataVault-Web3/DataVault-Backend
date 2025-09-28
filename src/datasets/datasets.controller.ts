@@ -50,4 +50,9 @@ export class DatasetsController {
   downloadDataset(@Param('id') id: string) {
     return this.datasetsService.downloadDataset(id);
   }
+
+  @Get(':id/access/:token')
+  getDatasetByToken(@Param('id') id: string, @Param('token') token: string) {
+    return this.datasetsService.getDatasetByToken(id, token);
+  }
 }

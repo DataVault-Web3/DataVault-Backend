@@ -12,25 +12,9 @@ async function bootstrap() {
     {
       "GET /datasets/*/download": {
         price: "$0.001", // 1 cent in USD
-        network: "polygon-amoy",
+        network: "base-sepolia",
         config: {
           description: "Download dataset after payment verification",
-          inputSchema: {
-            type: "object",
-            properties: {
-              id: { type: "string", description: "Dataset ID" }
-            }
-          },
-          outputSchema: {
-            type: "object",
-            properties: {
-              id: { type: "string" },
-              name: { type: "string" },
-              downloadUrl: { type: "string" },
-              fileSize: { type: "string" },
-              format: { type: "string" }
-            }
-          }
         }
       }
     },
@@ -39,16 +23,19 @@ async function bootstrap() {
     }
   ));
   
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  // app.useGlobalPipes(new ValidationPipe({
+  //   whitelist: true,
+  //   forbidNonWhitelisted: true,
+  //   transform: true,
+  // }));
 
   app.enableCors({
-    origin: true,
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   });
+
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

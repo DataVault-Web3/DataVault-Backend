@@ -1,14 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Dataset, DatasetDocument } from './schemas/dataset.schema';
+import { TempAccess, TempAccessDocument } from './schemas/temp-access.schema';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { UpdateDatasetDto } from './dto/update-dataset.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class DatasetsService {
   constructor(
     @InjectModel(Dataset.name) private datasetModel: Model<DatasetDocument>,
+    @InjectModel(TempAccess.name) private tempAccessModel: Model<TempAccessDocument>,
   ) {}
 
   async create(createDatasetDto: CreateDatasetDto): Promise<Dataset> {
@@ -82,18 +85,53 @@ export class DatasetsService {
   }
 
   async downloadDataset(id: string): Promise<any> {
+    //sleep for 10 second
     const dataset = await this.findOne(id);
     
-    return true
-    // Return dataset download information
-    // return {
-    //   id: dataset._id,
-    //   name: dataset.name,
-    //   description: dataset.description,
-    //   downloadUrl: dataset.downloadUrl || `https://your-storage.com/datasets/${id}`,
-    //   fileSize: dataset.fileSize || 'Unknown',
-    //   format: dataset.format || 'Unknown',
-    //   downloadInstructions: 'Dataset access granted after payment verification',
-    // };
+    // Generate a secure random token
+    const token = crypto.randomBytes(32).toString('hex');
+    
+    // Set expiry to 24 hours from now
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+    
+    // Create temporary access record
+    const tempAccess = new this.tempAccessModel({
+      token,
+      datasetId: id,
+      expiresAt,
+    });
+    
+    await tempAccess.save();
+    
+    // Return the temporary URL
+    return {
+      name: dataset.name,
+      description: dataset.description,
+      downloadUrl: `/datasets/${id}/access/${token}`,
+      expiresAt: expiresAt.toISOString(),
+      fileSize: dataset.size || 'Unknown',
+      format: dataset.dataFormat || 'Unknown',
+      downloadInstructions: 'This URL expires in 24 hours and can only be used once',
+    };
+  }
+
+  async getDatasetByToken(datasetId: string, token: string): Promise<Dataset> {
+    const tempAccess = await this.tempAccessModel.findOne({
+      token,
+      datasetId,
+      isUsed: false,
+      expiresAt: { $gt: new Date() }
+    }).exec();
+
+    if (!tempAccess) {
+      throw new BadRequestException('Invalid or expired access token');
+    }
+
+    tempAccess.usedAt = new Date();
+    await tempAccess.save();
+
+    // Return the dataset
+    return this.findOne(datasetId);
   }
 }

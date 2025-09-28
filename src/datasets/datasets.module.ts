@@ -10,12 +10,14 @@ import { WalrusService } from './services/walrus.service';
 import { CronJobService } from './services/cron-job.service';
 import { Dataset, DatasetSchema } from './schemas/dataset.schema';
 import { UserData, UserDataSchema } from './schemas/user-data.schema';
+import { TempAccess, TempAccessSchema } from './schemas/temp-access.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Dataset.name, schema: DatasetSchema },
       { name: UserData.name, schema: UserDataSchema },
+      { name: TempAccess.name, schema: TempAccessSchema },
     ]),
     ScheduleModule.forRoot(),
   ],

@@ -3,6 +3,7 @@ import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
 import { WalrusClient, WalrusFile } from '@mysten/walrus';
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { fromB64 } from '@mysten/sui/utils';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class WalrusService {
@@ -25,7 +26,11 @@ export class WalrusService {
 
     // Generate a keypair for signing transactions
     // In production, this should be loaded from secure storage
-    this.keypair = Ed25519Keypair.deriveKeypair('walrus-service-keypair-seed-phrase-for-testing-only');
+    const privateKey = process.env.WALRUS_PVT_KEY;
+    if (!privateKey) {
+      throw new Error('WALRUS_PVT_KEY environment variable is required');
+    }
+    this.keypair = Ed25519Keypair.fromSecretKey(privateKey);
     
     this.logger.log('WalrusService initialized with testnet configuration');
   }
