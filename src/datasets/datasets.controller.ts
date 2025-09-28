@@ -7,7 +7,10 @@ import {
   Param,
   Delete,
   Query,
+  Res,
+  Header,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { DatasetsService } from './datasets.service';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { UpdateDatasetDto } from './dto/update-dataset.dto';
@@ -52,7 +55,25 @@ export class DatasetsController {
   }
 
   @Get(':id/access/:token')
-  getDatasetByToken(@Param('id') id: string, @Param('token') token: string) {
-    return this.datasetsService.getDatasetByToken(id, token);
+  @Header('Content-Type', 'application/json')
+  @Header('Content-Disposition', 'attachment')
+  async getDatasetByToken(
+    @Param('id') id: string, 
+    @Param('token') token: string,
+    @Res() res: Response
+  ) {
+    const data = await this.datasetsService.getDatasetByToken(id, token);
+    
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `dataset-${id}-${timestamp}.json`;
+    
+    // Set headers for file download
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+    
+    // Send the JSON data as a downloadable file
+    res.json(data);
   }
 }

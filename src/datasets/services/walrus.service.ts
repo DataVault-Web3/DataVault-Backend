@@ -87,7 +87,13 @@ export class WalrusService {
       const [file] = await this.walrusClient.getFiles({ ids: [quiltId] });
       
       if (!file) {
-        throw new Error(`No file found for quilt ID: ${quiltId}`);
+        return {
+          quiltId,
+          data: null,
+          identifier: null,
+          tags: null,
+          timestamp: null
+        }
       }
 
       // Get file content as text
